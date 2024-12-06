@@ -12,6 +12,53 @@ def dipolar_interaction(i, j, bij, n):
                     - tensor_product(sx, i, n)*tensor_product(sx, j, n) \
                     - tensor_product(sy, i, n)*tensor_product(sy, j, n))
 
+def get_I_component(N, type):
+    assert type == 'x' or type == 'y' or type == 'z', "type should be x, y, or z"
+    sigma_i = 0
+    if type == 'x':
+        sigma_i = 1/2*qt.sigmax()
+    elif type == 'y':
+        sigma_i = 1/2*qt.sigmay()
+    elif type == 'z':
+        sigma_i = 1/2*qt.sigmaz()
+    else:
+        ValueError("type must be x, y, or z")
+    I_comp = 0
+    for j in range(N):
+        I_comp += tensor_product(sigma_i, j, N)
+    return I_comp
+
+def get_Hp(B_field, N, type):
+    """
+    Get pulse Hamiltonian
+    """
+    gamma = get_constants()[1]
+    assert type == 'x' or type == 'y' or type == 'z', "pulse type should be x or y"
+    Hp = 0
+    if type == 'x':
+        sigma_p = -gamma/2*B_field*qt.sigmax() 
+    elif type == 'y':
+        sigma_p = -gamma/2*B_field*qt.sigmay()
+    elif type == 'z':
+        sigma_p = -gamma/2*B_field*qt.sigmaz()
+    Hp = 0
+    for i in range(N):
+        Hp += tensor_product(sigma_p,i,N)
+    # Here B is in Tesla
+    return Hp
+
+def get_Hx_pulse():
+    pass
+
+def get_dipolar_interaction(bij_M):
+    Hdd = 0
+    N = bij_M.shape[0]
+    for i in range(N):
+        for j in range(i+1, N):
+            bij = bij_M[i][j]
+            Hdd += dipolar_interaction(i, j, bij_M[i][j], N)
+    return Hdd
+
 def generate_random_graph(N, r_min, r_max, seed, max_attempts = 1000):
     """
     Return numpy array with size (N, 3), where each index indicate position
