@@ -30,7 +30,7 @@ def plot_eigenenergy(H, output_path):
     plt.title('Eigenenergy distribution \n' + f'mean energy: {np.mean(eigen_energies)}')
     plt.savefig(os.path.join(output_path, "energy_distribution.png"))
 
-def plot_I(t_list, exp_Ix_l, exp_Iy_l, exp_Iz_l):
+def plot_I(t_list, exp_Ix_l, exp_Iy_l, exp_Iz_l, data_dir):
     fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize = (12, 4), layout = "constrained")
     ax[0].scatter(t_list, exp_Ix_l, s = 0.5, rasterized= True, color = 'r', label = 'Ix')
     ax[1].scatter(t_list, exp_Iy_l, s = 0.5, rasterized = True, color = 'b', label = 'Iy')
@@ -39,4 +39,4 @@ def plot_I(t_list, exp_Ix_l, exp_Iy_l, exp_Iz_l):
         ax[i].set_xlabel("time [s]")
         ax[i].set_ylabel("Signal [au]")
         ax[i].legend(fontsize = 12, markerscale = 5)
-    plt.show()
+    plt.savefig(os.path.join(data_dir, "I_plot.png"))

@@ -113,3 +113,9 @@ def get_interaction_matrix(positions):
             bij_M[j][i] = factor
     return bij_M
 
+def get_B_field(pulse_len, theta):
+    mu0, gamma, hbar = get_constants()
+    freq = 2 * np.pi/(pulse_len * 360/theta) #[rad/s]
+    B_field = freq/gamma
+    return B_field
+
