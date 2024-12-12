@@ -1,5 +1,6 @@
 import numpy as np
 import qutip as qt
+import yaml
 
 def tensor_product(pauli, i, n):
     op_list = [qt.qeye(2)] * n
@@ -46,9 +47,6 @@ def get_Hp(B_field, N, type):
         Hp += tensor_product(sigma_p,i,N)
     # Here B is in Tesla
     return Hp
-
-def get_Hx_pulse():
-    pass
 
 def get_dipolar_interaction(bij_M):
     Hdd = 0
@@ -118,4 +116,9 @@ def get_B_field(pulse_len, theta):
     freq = 2 * np.pi/(pulse_len * 360/theta) #[rad/s]
     B_field = freq/gamma
     return B_field
+
+def load_parameters_from_yaml(file_path):
+    with open(file_path, 'r') as file:
+        parameters = yaml.safe_load(file)
+    return parameters
 
