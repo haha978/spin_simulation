@@ -1,0 +1,9 @@
+---
+  # pulse length that corresponds to the angle
+  sequence_name: "spin_lock"
+  pulse_length: 60.e-6
+  theta: 90
+  spacing: 30.e-6
+  inter_pulse_dipole: False
+
+  
