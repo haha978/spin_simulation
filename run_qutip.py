@@ -69,6 +69,9 @@ def main():
     if sequence_name == 'spin_lock':
         seq = pulse_sequence.SpinLock(param_dict)
         Ham = seq.get_Hamiltonian(bij_M)
+    elif sequence_name == 'spin_lock_square_AC':
+        seq = pulse_sequence.SpinLock_Square_AC(param_dict)
+        Ham = seq.get_Hamiltonian(bij_M)
     else:
         ValueError("pulse sequence not supported")
 

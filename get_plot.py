@@ -38,11 +38,12 @@ def plot_every_4(t_list, pulse_length, spacing, t_step, Ii_l):
             else:
                 idx3_l.append(t_idx)
     max_Ii = max(Ii_l)
+    min_Ii = min(Ii_l)
     ax[0].scatter(t_list[idx0_l], Ii_l[idx0_l], color = 'r', rasterized = True, s = 0.5)
     ax[0].scatter(t_list[idx1_l], Ii_l[idx1_l], color = 'g', rasterized = True, s = 0.5)
     ax[0].scatter(t_list[idx2_l], Ii_l[idx2_l], color = 'b', rasterized = True, s = 0.5)
     ax[0].scatter(t_list[idx3_l], Ii_l[idx3_l], color = 'c', rasterized = True, s = 0.5)
-    ax[0].set_ylim(0, max_Ii + max_Ii/10)
+    ax[0].set_ylim(min_Ii - min_Ii/10, max_Ii + max_Ii/10)
     
     
     idx0_l, idx1_l = np.array(idx0_l), np.array(idx1_l)
@@ -56,7 +57,7 @@ def plot_every_4(t_list, pulse_length, spacing, t_step, Ii_l):
     ax[1].scatter(t2_l, I2_l, color = 'b', rasterized = True, s = 0.5)
     ax[1].scatter(t3_l, I3_l, color = 'c', rasterized = True, s = 0.5)
     
-    ax[1].set_ylim(0, max_Ii + max_Ii/10)
+    ax[1].set_ylim(min_Ii - min_Ii/10, max_Ii + max_Ii/10)
     plt.show()
 
 def main():

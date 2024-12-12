@@ -1,9 +1,8 @@
 ---
   # pulse length that corresponds to the angle
-  sequence_name: "spin_lock_AC_square"
+  sequence_name: "spin_lock_square_AC"
   pulse_length: 60.e-6
   theta: 90
-  spacing: 30.e-6
+  spacing: 100.e-6
   inter_pulse_dipole: False
-
-  
+  AC_field: 20.e-6 
