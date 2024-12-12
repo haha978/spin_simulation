@@ -9,6 +9,12 @@ def get_args(parser):
     args = parser.parse_args()
     return args
 
+def avg_nth_elements(arr, n):
+    # first cut off the array so that the length of it is multiple of n
+    arr = arr[:len(arr)//n * n]
+    reshaped_arr = arr.reshape(-1, n)
+    avg_arr = reshaped_arr.mean(axis = 1)
+    return avg_arr
 
 def plot_every_4(t_list, pulse_length, spacing, t_step, Ii_l):
     T = pulse_length + spacing
@@ -18,11 +24,11 @@ def plot_every_4(t_list, pulse_length, spacing, t_step, Ii_l):
     
     idx0_l, idx1_l = [], []
     idx2_l, idx3_l = [], []
-    fig, ax = plt.subplots(nrows = 1, ncols = 1, figsize = (4, 4), layout = "constrained")
+    fig, ax = plt.subplots(nrows = 2, ncols = 1, figsize = (4, 8), layout = "constrained")
     for t_idx, t_val in enumerate(t_list):
         micromotion_idx = t_idx % floquet_len
         tf_idx = t_idx // floquet_len
-        if plen <= micromotion_idx <= floquet_len:
+        if plen <= micromotion_idx < floquet_len:
             if tf_idx % 4 == 0:
                 idx0_l.append(t_idx)
             elif tf_idx % 4 == 1:
@@ -31,14 +37,26 @@ def plot_every_4(t_list, pulse_length, spacing, t_step, Ii_l):
                 idx2_l.append(t_idx)
             else:
                 idx3_l.append(t_idx)
+    max_Ii = max(Ii_l)
+    ax[0].scatter(t_list[idx0_l], Ii_l[idx0_l], color = 'r', rasterized = True, s = 0.5)
+    ax[0].scatter(t_list[idx1_l], Ii_l[idx1_l], color = 'g', rasterized = True, s = 0.5)
+    ax[0].scatter(t_list[idx2_l], Ii_l[idx2_l], color = 'b', rasterized = True, s = 0.5)
+    ax[0].scatter(t_list[idx3_l], Ii_l[idx3_l], color = 'c', rasterized = True, s = 0.5)
+    ax[0].set_ylim(0, max_Ii + max_Ii/10)
+    
+    
     idx0_l, idx1_l = np.array(idx0_l), np.array(idx1_l)
     idx2_l, idx3_l = np.array(idx2_l), np.array(idx3_l)
-    ax.scatter(t_list[idx0_l], Ii_l[idx0_l], color = 'r', rasterized = True, s = 0.5)
-    ax.scatter(t_list[idx1_l], Ii_l[idx1_l], color = 'g', rasterized = True, s = 0.5)
-    ax.scatter(t_list[idx2_l], Ii_l[idx2_l], color = 'b', rasterized = True, s = 0.5)
-    ax.scatter(t_list[idx3_l], Ii_l[idx3_l], color = 'c', rasterized = True, s = 0.5)
-    max_Ii = max(Ii_l)
-    ax.set_ylim(0, max_Ii + max_Ii/10)
+    t0_l , I0_l = avg_nth_elements(t_list[idx0_l], slen), avg_nth_elements(Ii_l[idx0_l], slen)
+    t1_l, I1_l = avg_nth_elements(t_list[idx1_l], slen), avg_nth_elements(Ii_l[idx1_l], slen)
+    t2_l, I2_l = avg_nth_elements(t_list[idx2_l], slen), avg_nth_elements(Ii_l[idx2_l], slen)
+    t3_l, I3_l = avg_nth_elements(t_list[idx3_l], slen), avg_nth_elements(Ii_l[idx3_l], slen)
+    ax[1].scatter(t0_l, I0_l, color = 'r', rasterized = True, s = 0.5)
+    ax[1].scatter(t1_l, I1_l, color = 'g', rasterized = True, s = 0.5)
+    ax[1].scatter(t2_l, I2_l, color = 'b', rasterized = True, s = 0.5)
+    ax[1].scatter(t3_l, I3_l, color = 'c', rasterized = True, s = 0.5)
+    
+    ax[1].set_ylim(0, max_Ii + max_Ii/10)
     plt.show()
 
 def main():
@@ -69,15 +87,15 @@ def main():
     spacing = param_dict["spacing"]
     t_step = param_dict["t_step"]
 
-    # fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize = (12, 4), layout = "constrained")
-    # ax[0].scatter(t_list, Ix_l, s = 0.5, rasterized= True, color = 'r', label = 'Ix')
-    # ax[1].scatter(t_list, Iy_l, s = 0.5, rasterized = True, color = 'b', label = 'Iy')
-    # ax[2].scatter(t_list, Iz_l, s = 0.5, rasterized = True, color = 'g', label = 'Iz')
-    # for i in range(3):
-    #     ax[i].set_xlabel("time [s]")
-    #     ax[i].set_ylabel("Signal [au]")
-    #     ax[i].legend(fontsize = 12, markerscale = 5)
-    # plt.show()
+    fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize = (12, 4), layout = "constrained")
+    ax[0].scatter(t_list, Ix_l, s = 0.5, rasterized= True, color = 'r', label = 'Ix')
+    ax[1].scatter(t_list, Iy_l, s = 0.5, rasterized = True, color = 'b', label = 'Iy')
+    ax[2].scatter(t_list, Iz_l, s = 0.5, rasterized = True, color = 'g', label = 'Iz')
+    for i in range(3):
+        ax[i].set_xlabel("time [s]")
+        ax[i].set_ylabel("Signal [au]")
+        ax[i].legend(fontsize = 12, markerscale = 5)
+    plt.show()
 
     plot_every_4(t_list, pulse_length, spacing, t_step, Ix_l)
 

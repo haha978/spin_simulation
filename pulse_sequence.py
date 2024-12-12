@@ -21,9 +21,10 @@ class SpinLock(PulseSequence):
         self.pulse_length = param_dict['pulse_length']
         self.theta = param_dict['theta']
         self.spacing = param_dict['spacing']
+        self.inter_pulse_dipole = param_dict['inter_pulse_dipole']
 
     def check_param_dict(self, param_dict):
-        required_keys = {'sequence_name', 'pulse_length', 'theta', 'spacing'}
+        required_keys = {'sequence_name', 'pulse_length', 'theta', 'spacing', 'inter_pulse_dipole'}
         assert required_keys.issubset(param_dict.keys()), f"required keys dont exists in the param_dict/yamlfile {required_keys}"
 
     def get_Hamiltonian(self, bij_M):
@@ -35,7 +36,10 @@ class SpinLock(PulseSequence):
         def spin_lock_Hamiltonian(t):
             tf = t - t//T*T
             if 0 <= tf <= self.pulse_length:
-                return Hp
+                if self.inter_pulse_dipole:
+                    return Hp + Hdd
+                else:
+                    return Hp
             else:
                 return Hdd
         return spin_lock_Hamiltonian
