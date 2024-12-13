@@ -60,6 +60,17 @@ def plot_every_4(t_list, pulse_length, spacing, t_step, Ii_l):
     ax[1].set_ylim(min_Ii - min_Ii/10, max_Ii + max_Ii/10)
     plt.show()
 
+def plot_Ii(t_list, Ix_l, Iy_l, Iz_l):
+    fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize = (12, 4), layout = "constrained")
+    ax[0].scatter(t_list, Ix_l, s = 0.5, rasterized= True, color = 'r', label = 'Ix')
+    ax[1].scatter(t_list, Iy_l, s = 0.5, rasterized = True, color = 'b', label = 'Iy')
+    ax[2].scatter(t_list, Iz_l, s = 0.5, rasterized = True, color = 'g', label = 'Iz')
+    for i in range(3):
+        ax[i].set_xlabel("time [s]")
+        ax[i].set_ylabel("Signal [au]")
+        ax[i].legend(fontsize = 12, markerscale = 5)
+    plt.show()
+
 def main():
     parser = argparse.ArgumentParser(description = "Train image model")
     args = get_args(parser)
@@ -88,16 +99,7 @@ def main():
     spacing = param_dict["spacing"]
     t_step = param_dict["t_step"]
 
-    fig, ax = plt.subplots(nrows = 1, ncols = 3, figsize = (12, 4), layout = "constrained")
-    ax[0].scatter(t_list, Ix_l, s = 0.5, rasterized= True, color = 'r', label = 'Ix')
-    ax[1].scatter(t_list, Iy_l, s = 0.5, rasterized = True, color = 'b', label = 'Iy')
-    ax[2].scatter(t_list, Iz_l, s = 0.5, rasterized = True, color = 'g', label = 'Iz')
-    for i in range(3):
-        ax[i].set_xlabel("time [s]")
-        ax[i].set_ylabel("Signal [au]")
-        ax[i].legend(fontsize = 12, markerscale = 5)
-    plt.show()
-
+    plot_Ii(t_list, Ix_l, Iy_l, Iz_l)
     plot_every_4(t_list, pulse_length, spacing, t_step, Ix_l)
 
 

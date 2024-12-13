@@ -65,22 +65,24 @@ class SpinLock_Square_AC(PulseSequence):
         Hp = get_Hp(B_field, N, 'x')
         Hac = get_Hp(self.AC_field, N, 'z')
         Hdd = get_dipolar_interaction(bij_M)
+        def AC_Ham(t):
+            tf = t - t//T*T
+            if 0 <= tf <= self.pulse_length/2 or \
+                (T + self.pulse_length)/2 <= tf <= T:
+                return Hac
+            else:
+                return -Hac
         def spin_lock_AC_square_Hamiltonian(t):
             tf = t - t//T*T
-            if 0 <= tf < T/2:
-                if (0 <= tf < self.pulse_length) and (T/4 <= tf < T/4 + self.pulse_length):
-                    if self.inter_pulse_dipole:
-                        return Hp + Hdd
-                    else:
-                        return Hp
+            Ham = 0
+            if (0 <= tf < self.pulse_length) or (T/4 <= tf < T/4 + self.pulse_length) \
+                or (T/2 <= tf < T/2+self.pulse_length) or (3*T/4 <= tf < 3*T/4 + self.pulse_length):
+                if self.inter_pulse_dipole:
+                    Ham = Hp + Hdd
                 else:
-                    return Hdd + Hac
-            elif T/2 <= tf < T:
-                if (T/2 <= tf < T/2+self.pulse_length) and (3*T/4 <= tf < 3*T/4 + self.pulse_length):
-                    if self.inter_pulse_dipole:
-                        return Hp + Hdd
-                    else:
-                        return Hp
-                else:
-                    return Hdd - Hac
+                    Ham = Hp
+            else:
+                Ham = Hdd
+            
+            Ham = Ham + AC_Ham(t)
         return spin_lock_AC_square_Hamiltonian
