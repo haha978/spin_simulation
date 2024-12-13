@@ -74,12 +74,14 @@ def generate_random_graph(N, r_min, r_max, seed, max_attempts = 1000):
     while len(vertices) < N:
         attempts = 0
         while attempts < max_attempts:
-            new_point = np.random.randn(3) * r_max
-            valid = False
+            new_point = vertices[-1] + np.random.randn(3) * r_max
+            condition1, condition2 = True, False
             for vertex in vertices:
-                if (r_min < np.linalg.norm(new_point - vertex) < r_max):
-                    valid = True
-                    break
+                if (np.linalg.norm(new_point - vertex) < r_min):
+                    condition1 = False
+                if np.linalg.norm(new_point - vertex) < r_max:
+                    condition2 = True
+            valid = condition1 and condition2
             if valid:
                 vertices.append(new_point)
                 break

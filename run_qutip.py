@@ -40,7 +40,7 @@ def main():
         # This is hard-coded for now
         print("generating new positions")
         diamond_inter_dist = 1.54e-10
-        r_min, r_max = diamond_inter_dist * 1, diamond_inter_dist * 7
+        r_min, r_max = diamond_inter_dist * 5, diamond_inter_dist * 8
 
         # generate random graph
         positions = generate_random_graph(N = N, r_min = r_min, r_max = r_max, seed = 10)
