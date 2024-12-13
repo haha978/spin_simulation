@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from utils import generate_random_graph
+from utils import generate_random_graph, get_list_k_v_in_dict
 
 
 def test_generate_random_graph():
@@ -35,21 +35,21 @@ def test_generate_random_graph():
     ax.set_zlabel('z [m]')
     plt.show()
 
+def get_list_in_key_test():
+    arr = list(range(0, 5, 1))
+    param_dict = {"key2": "Hello", "AC_field": 1}
+    for (k, v) in param_dict.items():
+        print(k)
+        print(v)
+    k, v = get_list_k_v_in_dict(param_dict)
+    print(k, v)
+
 
 def main():
-    # init_state = qt.tensor([ry(np.pi/2)*qt.basis(2, 0)]*10)
-    # print(init_state)
-    # N = 10
-    # ans1= get_I_component(10, 'y')
-    # params = load_parameters_from_yaml("/home/jm2239/spin_simulation/pulse_sequence/spinlock.yaml")
-    # print(params['pulse_length'])
-    # print(type(params['pulse_length']))
-    # print(params)
-    # arr = np.arange(1, 99+0.1, 1)
-    # index_arr = np.tile(np.concatenate((np.full(6, False), np.full(3, True))), reps = 11)
-    # print(index_arr)
-    # print(arr[index_arr])
-    test_generate_random_graph()
+    if True:
+        get_list_in_key_test()
+    else:
+        test_generate_random_graph()
 
 if __name__ == '__main__':
     main()

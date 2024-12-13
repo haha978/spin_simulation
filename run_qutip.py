@@ -1,6 +1,6 @@
 import numpy as np
 import qutip as qt
-from utils import generate_random_graph, get_interaction_matrix
+from utils import generate_random_graph, get_interaction_matrix, get_list_k_v_in_dict
 from utils import get_I_component, get_B_field, load_parameters_from_yaml
 from utils_plot import save_poisitons_graph, plot_I
 from qutip_qip.operations import ry
@@ -16,7 +16,7 @@ def get_args(parser):
     parser.add_argument('--t_total', type = float, required = True, help = "Total simulation time")
     parser.add_argument('--t_step', type = float, default = 5e-6, help = "time step for simulation[default: 5e-6]")
     parser.add_argument('--yaml', type = str, required = True, help = "PATH to yaml file that defines the pulse sequence")
-    parser.add_argument('--data_dir', type = str, help = "Directory name that stores data. If not provided, defaults to default directory name")
+    parser.add_argument('--data_dir', type = str, required = True, help = "Directory name that stores data. If not provided, defaults to default directory name")
     args = parser.parse_args()
     return args
 
@@ -65,52 +65,56 @@ def main():
 
     # LOAD PULSE SEQUENCE PARAMETERS 
     param_dict = load_parameters_from_yaml(YAML_PATH)
-    sequence_name = param_dict["sequence_name"]
-    if sequence_name == 'spin_lock':
-        seq = pulse_sequence.SpinLock(param_dict)
-        Ham = seq.get_Hamiltonian(bij_M)
-    elif sequence_name == 'spin_lock_square_AC':
-        seq = pulse_sequence.SpinLock_Square_AC(param_dict)
-        Ham = seq.get_Hamiltonian(bij_M)
-    else:
-        ValueError("pulse sequence not supported")
 
-    # MAKE DATA DIRECTORY THAT STORES ALL DATA AND HYPERPARAMETERS
-    DATA_DIR = args.data_dir
-    
-    if DATA_DIR == None:
-        DATA_DIR_PATH = os.path.join(OUTPUT_PATH, f't_total_{t_total}_t_step_{t_step}_sn_{sequence_name}')
-    else:
-        DATA_DIR_PATH = os.path.join(OUTPUT_PATH, DATA_DIR)
+    # ITERATE IF THERE IS A LIST
+    key, v_l = get_list_k_v_in_dict(param_dict)
+    if key == None and v_l == None:
+        key, v_l = "sequence_name", [param_dict["sequence_name"]]
+    for val in v_l:
+        param_dict[key] = val
+        sequence_name = param_dict["sequence_name"]
+        if sequence_name == 'spin_lock':
+            seq = pulse_sequence.SpinLock(param_dict)
+            Ham = seq.get_Hamiltonian(bij_M)
+        elif sequence_name == 'spin_lock_square_AC':
+            seq = pulse_sequence.SpinLock_Square_AC(param_dict)
+            Ham = seq.get_Hamiltonian(bij_M)
+        else:
+            ValueError("pulse sequence not supported")
+
+        # MAKE DATA DIRECTORY THAT STORES ALL DATA AND HYPERPARAMETERS
+        DATA_DIR = args.data_dir
+        
+        DATA_DIR_PATH = os.path.join(OUTPUT_PATH, DATA_DIR, f"{key}_{val}")
         if not os.path.exists(DATA_DIR_PATH):
             os.makedirs(DATA_DIR_PATH)
 
-    param_dict['t_total'], param_dict['t_step'] = args.t_total, args.t_step
-    
-    # GENERATE PATH NAMES WHERE THE DATA WILL BE STORED
-    param_dict_p = os.path.join(DATA_DIR_PATH, "param_dict.npy")
-    t_list_p = os.path.join(DATA_DIR_PATH, "t_list.npy")
-    exp_Ix_p = os.path.join(DATA_DIR_PATH, "exp_Ix_l.npy")
-    exp_Iy_p = os.path.join(DATA_DIR_PATH, "exp_Iy_l.npy")
-    exp_Iz_p = os.path.join(DATA_DIR_PATH, "exp_Iz_l.npy")
-    
-    # GENERATE OBSERVABLES
-    Ix, Iy, Iz = get_I_component(N, 'x'), get_I_component(N, 'y'), get_I_component(N, 'z')
-    e_ops = [Ix, Iy, Iz]
+        param_dict['t_total'], param_dict['t_step'] = args.t_total, args.t_step
+        
+        # GENERATE PATH NAMES WHERE THE DATA WILL BE STORED
+        param_dict_p = os.path.join(DATA_DIR_PATH, "param_dict.npy")
+        t_list_p = os.path.join(DATA_DIR_PATH, "t_list.npy")
+        exp_Ix_p = os.path.join(DATA_DIR_PATH, "exp_Ix_l.npy")
+        exp_Iy_p = os.path.join(DATA_DIR_PATH, "exp_Iy_l.npy")
+        exp_Iz_p = os.path.join(DATA_DIR_PATH, "exp_Iz_l.npy")
+        
+        # GENERATE OBSERVABLES
+        Ix, Iy, Iz = get_I_component(N, 'x'), get_I_component(N, 'y'), get_I_component(N, 'z')
+        e_ops = [Ix, Iy, Iz]
 
-    # TIME EVOLUTION
-    result = qt.sesolve(Ham, init_state, t_list, e_ops = e_ops, options = {"store_states": False})
-    exp_Ix_l, exp_Iy_l, exp_Iz_l = result.expect[0], result.expect[1], result.expect[2]
-    
-    # SAVE ALL DATA / HYPERPARMETERS
-    np.save(t_list_p, t_list)
-    np.save(exp_Ix_p, exp_Ix_l)
-    np.save(exp_Iy_p, exp_Iy_l)
-    np.save(exp_Iz_p, exp_Iz_l)
-    with open(os.path.join(DATA_DIR_PATH, "param_dict.yaml"), "w") as f:
-        yaml.dump(param_dict, f, default_flow_style=False, sort_keys=False)
-    
-    # PLOT AND SAVE the expectation value
-    plot_I(t_list, exp_Ix_l, exp_Iy_l, exp_Iz_l, DATA_DIR_PATH)
+        # TIME EVOLUTION
+        result = qt.sesolve(Ham, init_state, t_list, e_ops = e_ops, options = {"store_states": False})
+        exp_Ix_l, exp_Iy_l, exp_Iz_l = result.expect[0], result.expect[1], result.expect[2]
+        
+        # SAVE ALL DATA / HYPERPARMETERS
+        np.save(t_list_p, t_list)
+        np.save(exp_Ix_p, exp_Ix_l)
+        np.save(exp_Iy_p, exp_Iy_l)
+        np.save(exp_Iz_p, exp_Iz_l)
+        with open(os.path.join(DATA_DIR_PATH, f"param_dict.yaml"), "w") as f:
+            yaml.dump(param_dict, f, default_flow_style=False, sort_keys=False)
+        
+        # PLOT AND SAVE the expectation value
+        plot_I(t_list, exp_Ix_l, exp_Iy_l, exp_Iz_l, DATA_DIR_PATH)
 if __name__ == '__main__':
     main()

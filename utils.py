@@ -124,3 +124,9 @@ def load_parameters_from_yaml(file_path):
         parameters = yaml.safe_load(file)
     return parameters
 
+def get_list_k_v_in_dict(dict):
+    for k, v in dict.items():
+        if isinstance(v, list):
+            return k, v
+    return None, None
+
