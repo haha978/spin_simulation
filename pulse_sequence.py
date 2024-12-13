@@ -85,4 +85,5 @@ class SpinLock_Square_AC(PulseSequence):
                 Ham = Hdd
             
             Ham = Ham + AC_Ham(t)
+            return Ham
         return spin_lock_AC_square_Hamiltonian
