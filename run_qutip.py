@@ -71,6 +71,7 @@ def main():
     if key == None and v_l == None:
         key, v_l = "sequence_name", [param_dict["sequence_name"]]
     for val in v_l:
+        breakpoint()
         param_dict[key] = val
         sequence_name = param_dict["sequence_name"]
         if sequence_name == 'spin_lock':
