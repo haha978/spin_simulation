@@ -71,7 +71,6 @@ def main():
     if key == None and v_l == None:
         key, v_l = "sequence_name", [param_dict["sequence_name"]]
     for val in v_l:
-        breakpoint()
         param_dict[key] = val
         sequence_name = param_dict["sequence_name"]
         if sequence_name == 'spin_lock':
@@ -85,8 +84,10 @@ def main():
 
         # MAKE DATA DIRECTORY THAT STORES ALL DATA AND HYPERPARAMETERS
         DATA_DIR = args.data_dir
-        
-        DATA_DIR_PATH = os.path.join(OUTPUT_PATH, DATA_DIR, f"{key}_{val}")
+        if len(v_l) == 1 and key == "sequence_name":
+            DATA_DIR_PATH = os.path.join(OUTPUT_PATH, DATA_DIR)
+        else:
+            DATA_DIR_PATH = os.path.join(OUTPUT_PATH, DATA_DIR, f"{key}_{val}")
         if not os.path.exists(DATA_DIR_PATH):
             os.makedirs(DATA_DIR_PATH)
 
